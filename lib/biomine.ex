@@ -4,15 +4,10 @@ defmodule Biomine do
   """
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Biomine.hello()
-      :world
-
+  Format JavaScript/TypeScript source.
   """
-  def hello do
-    :world
+  def format_js(source, opts \\ []) do
+    # TODO: make opts support
+    Biomine.Native.format_js(source)
   end
 end
