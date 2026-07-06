@@ -1,7 +1,7 @@
 defmodule Biomine.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version File.read!("VERSION") |> String.trim()
   @source_url "https://github.com/wingyplus/biomine"
 
   def project do
@@ -44,7 +44,8 @@ defmodule Biomine.MixProject do
         "Cargo.toml",
         "Cargo.lock",
         "checksum-*.exs",
-        "mix.exs"
+        "mix.exs",
+        "VERSION"
       ],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
