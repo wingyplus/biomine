@@ -27,7 +27,8 @@ defmodule Biomine.MixProject do
       {:rustler_precompiled, "~> 0.9"},
       # rustler is only needed to compile the NIF from source (force_build, the
       # CI release build, or when no precompiled artifact exists for the target).
-      {:rustler, "~> 0.38", optional: true}
+      {:rustler, "~> 0.38", optional: true},
+      {:nimble_options, "~> 1.1"}
     ]
   end
 
