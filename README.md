@@ -26,6 +26,40 @@ The NIF ships as a **precompiled binary** via
 need a Rust toolchain to use this library — the matching artifact for your OS,
 architecture, and NIF version is downloaded automatically at compile time.
 
+## Mix formatter plugin
+
+Biomine can be used as a `mix format` plugin for JavaScript and TypeScript
+files. Add the plugin and the file extensions you want Mix to format to your
+`.formatter.exs`:
+
+```elixir
+[
+  plugins: [Biomine.Mix.JsFormatter],
+  inputs: [
+    "{mix,.formatter}.exs",
+    "{config,lib,test}/**/*.{ex,exs}",
+    "assets/**/*.{js,jsx,ts,tsx}"
+  ]
+]
+```
+
+Formatter options can be passed with the `:biomine` key:
+
+```elixir
+[
+  plugins: [Biomine.Mix.JsFormatter],
+  biomine: [
+    quote_style: :single,
+    semicolons: :as_needed
+  ],
+  inputs: [
+    "{mix,.formatter}.exs",
+    "{config,lib,test}/**/*.{ex,exs}",
+    "assets/**/*.{js,jsx,ts,tsx}"
+  ]
+]
+```
+
 ## Building from source
 
 You only need this if you are hacking on the NIF, or you are on a target for
