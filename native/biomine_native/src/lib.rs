@@ -1,3 +1,4 @@
+use biome_diagnostics::{Diagnostic, PrintDescription};
 use biome_formatter::{
     AttributePosition, IndentStyle, IndentWidth, LineEnding, LineWidth, QuoteStyle,
 };
@@ -8,7 +9,7 @@ use biome_js_formatter::context::{
 };
 use biome_js_parser::JsParserOptions;
 use biome_js_syntax::JsFileSource;
-use rustler::{Atom, Binary, Env, NifResult, OwnedBinary, Term};
+use rustler::{Atom, Binary, Encoder, Env, NifResult, OwnedBinary, Term};
 
 mod atoms {
     rustler::atoms! {
@@ -16,6 +17,10 @@ mod atoms {
         error,
         parse_error,
         invalid_option,
+        message,
+        span,
+        start,
+        end,
         indent_style,
         indent_width,
         line_ending,
@@ -65,7 +70,7 @@ fn format_js<'a>(
     let input = std::str::from_utf8(source.as_slice()).unwrap();
     let parsed = biome_js_parser::parse(input, file_source, JsParserOptions::default());
     if parsed.has_errors() {
-        return error(atoms::parse_error().to_term(env));
+        return error(parse_error(env, parsed.diagnostics()));
     }
     let js_options = match override_js_options(JsFormatOptions::new(file_source), options) {
         Ok(options) => options,
@@ -83,6 +88,43 @@ fn format_js<'a>(
     binary.as_mut_slice().copy_from_slice(output);
 
     ok(binary.release(env).to_term(env))
+}
+
+fn parse_error<'a>(
+    env: Env<'a>,
+    diagnostics: &[biome_parser::diagnostic::ParseDiagnostic],
+) -> Term<'a> {
+    let diagnostics = diagnostics
+        .iter()
+        .map(|diagnostic| parse_diagnostic(env, diagnostic))
+        .collect::<Vec<_>>();
+
+    (atoms::parse_error(), diagnostics).encode(env)
+}
+
+fn parse_diagnostic<'a>(
+    env: Env<'a>,
+    diagnostic: &biome_parser::diagnostic::ParseDiagnostic,
+) -> Term<'a> {
+    let mut keys = vec![atoms::message().to_term(env)];
+    let mut values = vec![format!("{}", PrintDescription(diagnostic)).encode(env)];
+
+    if let Some(span) = diagnostic.location().span {
+        keys.push(atoms::span().to_term(env));
+        values.push(parse_span(env, span));
+    }
+
+    Term::map_from_term_arrays(env, &keys, &values).unwrap()
+}
+
+fn parse_span<'a>(env: Env<'a>, span: biome_rowan::TextRange) -> Term<'a> {
+    let keys = [atoms::start().to_term(env), atoms::end().to_term(env)];
+    let values = [
+        u32::from(span.start()).encode(env),
+        u32::from(span.end()).encode(env),
+    ];
+
+    Term::map_from_term_arrays(env, &keys, &values).unwrap()
 }
 
 fn override_js_options(

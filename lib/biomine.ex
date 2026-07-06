@@ -8,9 +8,9 @@ defmodule Biomine do
 
   Returns `{:ok, formatted_source}` when formatting succeeds.
 
-  Returns `{:error, :parse_error}` when the source cannot be parsed and
-  `{:error, :invalid_option}` when an unsupported option or option value is
-  provided.
+  Returns `{:error, {:parse_error, diagnostics}}` when the source cannot be
+  parsed and `{:error, :invalid_option}` when an unsupported option or option
+  value is provided.
 
   ## Options
 
@@ -43,7 +43,18 @@ defmodule Biomine do
       {:ok, "let x = 'hello';\\n"}
 
       iex> Biomine.format_js("funtion f(")
-      {:error, :parse_error}
+      {:error,
+       {:parse_error,
+        [
+          %{
+            message: "Expected a semicolon or an implicit semicolon after a statement, but found none",
+            span: %{start: 8, end: 9}
+          },
+          %{
+            message: "expected `)` but instead the file ends",
+            span: %{start: 10, end: 10}
+          }
+        ]}}
   """
   def format_js(source, opts \\ []) do
     Biomine.Native.format_js(source, opts)
