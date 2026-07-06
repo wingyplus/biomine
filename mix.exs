@@ -8,11 +8,12 @@ defmodule Biomine.MixProject do
     [
       app: :biomine,
       version: @version,
+      description: "Elixir bindings for the Biome formatter",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      source_url: @source_url
+      source_url: @source_url,
     ]
   end
 
@@ -27,8 +28,9 @@ defmodule Biomine.MixProject do
       {:rustler_precompiled, "~> 0.9"},
       # rustler is only needed to compile the NIF from source (force_build, the
       # CI release build, or when no precompiled artifact exists for the target).
-      {:rustler, "~> 0.38", optional: true},
-      {:nimble_options, "~> 1.1"}
+      {:rustler, ">= 0.0.0", optional: true},
+      {:nimble_options, "~> 1.1"},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false, warn_if_outdated: true},
     ]
   end
 
