@@ -35,6 +35,7 @@ defmodule Biomine.MixProject do
   defp package do
     [
       files: [
+        "LICENSE",
         "lib",
         "native/biomine_native/src",
         "native/biomine_native/Cargo.toml",
