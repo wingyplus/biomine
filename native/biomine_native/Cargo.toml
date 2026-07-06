@@ -19,4 +19,4 @@ biome_rowan = "=0.5.7"
 biome_parser = "=0.5.7"
 biome_unicode_table = "=0.5.7"
 
-rustler = version = "0.38.0"
+rustler = "0.38.0"
