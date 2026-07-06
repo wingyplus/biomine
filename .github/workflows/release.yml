@@ -36,6 +36,15 @@ jobs:
         run: |
           echo "PROJECT_VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
+      - name: Set Cargo target directory
+        shell: bash
+        run: |
+          # native/biomine_native is a member of the workspace rooted at the
+          # repo root, so a plain `cargo build` there places artifacts under
+          # <repo root>/target/. rustler-precompiled-action always looks for
+          # them under <project-dir>/target/, so force cargo to build there.
+          echo "CARGO_TARGET_DIR=target" >> $GITHUB_ENV
+
       - name: Build the NIF
         id: build-crate
         uses: philss/rustler-precompiled-action@v1.1.4
