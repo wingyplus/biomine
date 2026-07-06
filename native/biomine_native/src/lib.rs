@@ -1,24 +1,78 @@
+use biome_formatter::{
+    AttributePosition, IndentStyle, IndentWidth, LineEnding, LineWidth, QuoteStyle,
+};
+use biome_js_formatter::context::trailing_comma::TrailingComma;
 use biome_js_formatter::context::JsFormatOptions;
+use biome_js_formatter::context::{
+    ArrowParentheses, BracketSameLine, BracketSpacing, QuoteProperties, Semicolons,
+};
 use biome_js_parser::JsParserOptions;
 use biome_js_syntax::JsFileSource;
-use rustler::{Binary, Env, NifResult, OwnedBinary};
+use rustler::{Atom, Binary, Env, NifResult, OwnedBinary, Term};
 
-rustler::atoms! {
-    source_not_utf8
+mod atoms {
+    rustler::atoms! {
+        ok,
+        error,
+        parse_error,
+        invalid_option,
+        indent_style,
+        indent_width,
+        line_ending,
+        line_width,
+        quote_style,
+        jsx_quote_style,
+        quote_properties,
+        trailing_comma,
+        semicolons,
+        arrow_parentheses,
+        bracket_spacing,
+        bracket_same_line,
+        attribute_position,
+        tab,
+        space,
+        lf,
+        crlf,
+        cr,
+        double,
+        single,
+        as_needed,
+        preserve,
+        all,
+        es5,
+        none,
+        always,
+        auto,
+        multiline
+    }
 }
 
-// TODO: support JS/TS format options.
+fn ok<T>(term: T) -> (Atom, T) {
+    (atoms::ok(), term)
+}
+
+fn error<T>(term: T) -> (Atom, T) {
+    (atoms::error(), term)
+}
+
 #[rustler::nif]
-fn format_js<'a>(env: Env<'a>, source: Binary<'a>) -> NifResult<Binary<'a>> {
+fn format_js<'a>(
+    env: Env<'a>,
+    source: Binary<'a>,
+    options: Vec<(Atom, Term<'a>)>,
+) -> (Atom, Term<'a>) {
     let file_source = JsFileSource::ts();
     let input = std::str::from_utf8(source.as_slice()).unwrap();
     let parsed = biome_js_parser::parse(input, file_source, JsParserOptions::default());
-    // TODO: parser check.
-    // if parsed.has_errors() {
-    //     return Err(Error::Term(format!("{:?}", parsed.diagnostics())));
-    // }
-    let options = JsFormatOptions::new(file_source);
-    let formatted = biome_js_formatter::format_node(options, &parsed.syntax())
+    if parsed.has_errors() {
+        return error(atoms::parse_error().to_term(env));
+    }
+    let js_options = match override_js_options(JsFormatOptions::new(file_source), options) {
+        Ok(options) => options,
+        Err(reason) => return error(reason.to_term(env)),
+    };
+
+    let formatted = biome_js_formatter::format_node(js_options, &parsed.syntax())
         .unwrap()
         .print_with_indent(2)
         .unwrap();
@@ -28,7 +82,143 @@ fn format_js<'a>(env: Env<'a>, source: Binary<'a>) -> NifResult<Binary<'a>> {
     let mut binary = OwnedBinary::new(output.len()).unwrap();
     binary.as_mut_slice().copy_from_slice(output);
 
-    Ok(binary.release(env))
+    ok(binary.release(env).to_term(env))
+}
+
+fn override_js_options(
+    mut format_options: JsFormatOptions,
+    options: Vec<(Atom, Term)>,
+) -> Result<JsFormatOptions, Atom> {
+    for (key, value) in options {
+        match key {
+            key if key == atoms::indent_style() => {
+                format_options.set_indent_style(decode_indent_style(value)?);
+            }
+            key if key == atoms::indent_width() => {
+                format_options.set_indent_width(IndentWidth::from(decode_u8(value)?));
+            }
+            key if key == atoms::line_ending() => {
+                format_options.set_line_ending(decode_line_ending(value)?);
+            }
+            key if key == atoms::line_width() => {
+                let line_width =
+                    LineWidth::try_from(decode_u16(value)?).map_err(|_| atoms::invalid_option())?;
+                format_options.set_line_width(line_width);
+            }
+            key if key == atoms::quote_style() => {
+                format_options.set_quote_style(decode_quote_style(value)?);
+            }
+            key if key == atoms::jsx_quote_style() => {
+                format_options.set_jsx_quote_style(decode_quote_style(value)?);
+            }
+            key if key == atoms::quote_properties() => {
+                format_options.set_quote_properties(decode_quote_properties(value)?);
+            }
+            key if key == atoms::trailing_comma() => {
+                format_options.set_trailing_comma(decode_trailing_comma(value)?);
+            }
+            key if key == atoms::semicolons() => {
+                format_options.set_semicolons(decode_semicolons(value)?);
+            }
+            key if key == atoms::arrow_parentheses() => {
+                format_options.set_arrow_parentheses(decode_arrow_parentheses(value)?);
+            }
+            key if key == atoms::bracket_spacing() => {
+                format_options.set_bracket_spacing(BracketSpacing::from(decode_bool(value)?));
+            }
+            key if key == atoms::bracket_same_line() => {
+                format_options.set_bracket_same_line(BracketSameLine::from(decode_bool(value)?));
+            }
+            key if key == atoms::attribute_position() => {
+                format_options.set_attribute_position(decode_attribute_position(value)?);
+            }
+            _ => return Err(atoms::invalid_option()),
+        }
+    }
+
+    Ok(format_options)
+}
+
+fn decode_atom(term: Term) -> Result<Atom, Atom> {
+    term.decode::<Atom>().map_err(|_| atoms::invalid_option())
+}
+
+fn decode_bool(term: Term) -> Result<bool, Atom> {
+    term.decode::<bool>().map_err(|_| atoms::invalid_option())
+}
+
+fn decode_u8(term: Term) -> Result<u8, Atom> {
+    term.decode::<u8>().map_err(|_| atoms::invalid_option())
+}
+
+fn decode_u16(term: Term) -> Result<u16, Atom> {
+    term.decode::<u16>().map_err(|_| atoms::invalid_option())
+}
+
+fn decode_indent_style(term: Term) -> Result<IndentStyle, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::tab() => Ok(IndentStyle::Tab),
+        atom if atom == atoms::space() => Ok(IndentStyle::Space),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_line_ending(term: Term) -> Result<LineEnding, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::lf() => Ok(LineEnding::Lf),
+        atom if atom == atoms::crlf() => Ok(LineEnding::Crlf),
+        atom if atom == atoms::cr() => Ok(LineEnding::Cr),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_quote_style(term: Term) -> Result<QuoteStyle, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::double() => Ok(QuoteStyle::Double),
+        atom if atom == atoms::single() => Ok(QuoteStyle::Single),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_quote_properties(term: Term) -> Result<QuoteProperties, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::as_needed() => Ok(QuoteProperties::AsNeeded),
+        atom if atom == atoms::preserve() => Ok(QuoteProperties::Preserve),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_trailing_comma(term: Term) -> Result<TrailingComma, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::all() => Ok(TrailingComma::All),
+        atom if atom == atoms::es5() => Ok(TrailingComma::Es5),
+        atom if atom == atoms::none() => Ok(TrailingComma::None),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_semicolons(term: Term) -> Result<Semicolons, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::always() => Ok(Semicolons::Always),
+        atom if atom == atoms::as_needed() => Ok(Semicolons::AsNeeded),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_arrow_parentheses(term: Term) -> Result<ArrowParentheses, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::always() => Ok(ArrowParentheses::Always),
+        atom if atom == atoms::as_needed() => Ok(ArrowParentheses::AsNeeded),
+        _ => Err(atoms::invalid_option()),
+    }
+}
+
+fn decode_attribute_position(term: Term) -> Result<AttributePosition, Atom> {
+    match decode_atom(term)? {
+        atom if atom == atoms::auto() => Ok(AttributePosition::Auto),
+        atom if atom == atoms::multiline() => Ok(AttributePosition::Multiline),
+        _ => Err(atoms::invalid_option()),
+    }
 }
 
 #[rustler::nif]

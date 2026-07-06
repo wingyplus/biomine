@@ -7,7 +7,6 @@ defmodule Biomine do
   Format JavaScript/TypeScript source.
   """
   def format_js(source, opts \\ []) do
-    # TODO: make opts support
-    Biomine.Native.format_js(source)
+    Biomine.Native.format_js(source, opts)
   end
 end

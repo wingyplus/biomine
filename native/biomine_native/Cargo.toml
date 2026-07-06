@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 [dependencies]
 biome_css_formatter = "=0.5.7"
 biome_css_syntax = "=0.5.7"
+biome_formatter = "=0.5.7"
 biome_js_formatter = "=0.5.7"
 biome_js_parser = "=0.5.7"
 biome_js_syntax = "=0.5.7"
