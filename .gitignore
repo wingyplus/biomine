@@ -25,3 +25,5 @@ biomine-*.tar
 
 # Rust binary artifacts
 /target/
+priv/native/*.so
+native/biomine_native/target/
