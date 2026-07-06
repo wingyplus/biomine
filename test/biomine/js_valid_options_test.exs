@@ -34,9 +34,9 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [line_width: 20],
         output: """
         const x = [
-        \talpha,
-        \tbeta,
-        \tgamma,
+          alpha,
+          beta,
+          gamma,
         ];
         """
       },
@@ -62,9 +62,9 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [line_width: 20, trailing_comma: :none],
         output: """
         const x = [
-        \talpha,
-        \tbeta,
-        \tgamma
+          alpha,
+          beta,
+          gamma
         ];
         """
       },
