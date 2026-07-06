@@ -13,7 +13,7 @@ defmodule Biomine.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      source_url: @source_url,
+      source_url: @source_url
     ]
   end
 
@@ -30,7 +30,10 @@ defmodule Biomine.MixProject do
       # CI release build, or when no precompiled artifact exists for the target).
       {:rustler, ">= 0.0.0", optional: true},
       {:nimble_options, "~> 1.1"},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false, warn_if_outdated: true},
+      # phoenix_live_view is only needed to implement Biomine.LiveView.TagFormatter;
+      # host applications must already depend on it to use Phoenix.LiveView.HTMLFormatter.
+      {:phoenix_live_view, "~> 1.2", optional: true},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false, warn_if_outdated: true}
     ]
   end
 

@@ -60,6 +60,29 @@ Formatter options can be passed with the `:biomine` key:
 ]
 ```
 
+## Phoenix.LiveView.HTMLFormatter tag formatter
+
+Biomine can also format `<script>` tags inside `.heex` templates — including
+[colocated hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.ColocatedHook.html) —
+when used as a `Phoenix.LiveView.HTMLFormatter.TagFormatter`. Add it to your
+`.formatter.exs` alongside `Phoenix.LiveView.HTMLFormatter`:
+
+```elixir
+[
+  plugins: [Phoenix.LiveView.HTMLFormatter],
+  tag_formatters: %{script: Biomine.LiveView.TagFormatter},
+  inputs: [
+    "{mix,.formatter}.exs",
+    "{config,lib,test}/**/*.{ex,exs,heex}"
+  ]
+]
+```
+
+This requires `:phoenix_live_view` (`~> 1.2`) in your own dependencies, since
+that's where `Phoenix.LiveView.HTMLFormatter` and the `TagFormatter` behaviour
+live. The same `:biomine` options key used by the Mix formatter plugin above
+is honored here too.
+
 ## Building from source
 
 You only need this if you are hacking on the NIF, or you are on a target for
