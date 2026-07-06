@@ -8,8 +8,8 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [indent_style: :space],
         output: """
         if (x) {
-              y();
-            }
+          y();
+        }
         """
       },
       %{
@@ -18,17 +18,15 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [indent_style: :space, indent_width: 4],
         output: """
         if (x) {
-                    y();
-                }
+            y();
+        }
         """
       },
       %{
         option: "line_ending",
         source: "let x=1",
         opts: [line_ending: :crlf],
-        output: """
-        let x = 1;\r
-        """
+        output: "let x = 1;\r\n"
       },
       %{
         option: "line_width",
@@ -36,10 +34,10 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [line_width: 20],
         output: """
         const x = [
-        \t\t\talpha,
-        \t\t\tbeta,
-        \t\t\tgamma,
-        \t\t];
+        \talpha,
+        \tbeta,
+        \tgamma,
+        ];
         """
       },
       %{
@@ -64,10 +62,10 @@ defmodule Biomine.JSValidOptionsTest do
         opts: [line_width: 20, trailing_comma: :none],
         output: """
         const x = [
-        \t\t\talpha,
-        \t\t\tbeta,
-        \t\t\tgamma
-        \t\t];
+        \talpha,
+        \tbeta,
+        \tgamma
+        ];
         """
       },
       %{

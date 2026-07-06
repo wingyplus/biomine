@@ -74,7 +74,7 @@ fn format_js<'a>(
 
     let formatted = biome_js_formatter::format_node(js_options, &parsed.syntax())
         .unwrap()
-        .print_with_indent(2)
+        .print()
         .unwrap();
 
     let output = formatted.as_code().as_bytes();
