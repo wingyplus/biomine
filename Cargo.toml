@@ -2,3 +2,7 @@
 resolver = "2"
 
 members = ["native/biomine_native"]
+
+# Provides a small build size for the "release" profile, but takes more time to build.
+[profile.release]
+lto = true
