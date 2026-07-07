@@ -1,3 +1,5 @@
+use biome_css_formatter::context::CssFormatOptions;
+use biome_css_parser::CssParserOptions;
 use biome_diagnostics::{Diagnostic, PrintDescription};
 use biome_formatter::{
     AttributePosition, IndentStyle, IndentWidth, LineEnding, LineWidth, QuoteStyle,
@@ -9,7 +11,7 @@ use biome_js_formatter::context::{
 };
 use biome_js_parser::JsParserOptions;
 use biome_js_syntax::JsFileSource;
-use rustler::{Atom, Binary, Encoder, Env, NifResult, OwnedBinary, Term};
+use rustler::{Atom, Binary, Encoder, Env, OwnedBinary, Term};
 
 mod atoms {
     rustler::atoms! {
@@ -264,13 +266,27 @@ fn decode_attribute_position(term: Term) -> Result<AttributePosition, Atom> {
 }
 
 #[rustler::nif]
-fn format_css<'a>(env: Env<'a>, source: Binary<'a>) -> NifResult<Binary<'a>> {
-    let input: &[u8] = source.as_slice();
+fn format_css<'a>(env: Env<'a>, source: Binary<'a>) -> (Atom, Term<'a>) {
+    let input = std::str::from_utf8(source.as_slice()).unwrap();
+    let parsed = biome_css_parser::parse_css(input, CssParserOptions::default());
+    if parsed.has_errors() {
+        return error(parse_error(env, parsed.diagnostics()));
+    }
 
-    let mut binary = OwnedBinary::new(input.len()).unwrap();
-    binary.as_mut_slice().copy_from_slice(input);
+    let css_options = CssFormatOptions::default()
+        .with_indent_style(IndentStyle::Space)
+        .with_indent_width(IndentWidth::from(2));
+    let formatted = biome_css_formatter::format_node(css_options, &parsed.syntax())
+        .unwrap()
+        .print()
+        .unwrap();
 
-    Ok(binary.release(env))
+    let output = formatted.as_code().as_bytes();
+
+    let mut binary = OwnedBinary::new(output.len()).unwrap();
+    binary.as_mut_slice().copy_from_slice(output);
+
+    ok(binary.release(env).to_term(env))
 }
 
 rustler::init!("Elixir.Biomine.Native");

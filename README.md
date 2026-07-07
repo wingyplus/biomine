@@ -1,8 +1,8 @@
 # Biomine
 
 Elixir bindings for the [Biome](https://biomejs.dev/) formatter, exposed as a
-Rust NIF. Format JavaScript/TypeScript (and, soon, CSS) source directly from
-Elixir without shelling out to Node.
+Rust NIF. Format JavaScript/TypeScript and CSS source directly from Elixir
+without shelling out to Node.
 
 ```elixir
 iex> Biomine.format_js("const  x=1")
@@ -56,6 +56,19 @@ Formatter options can be passed with the `:biomine` key:
     "{mix,.formatter}.exs",
     "{config,lib,test}/**/*.{ex,exs}",
     "assets/**/*.{js,jsx,ts,tsx}"
+  ]
+]
+```
+
+Biomine can also format CSS files with `Biomine.Mix.CssFormatter`:
+
+```elixir
+[
+  plugins: [Biomine.Mix.JsFormatter, Biomine.Mix.CssFormatter],
+  inputs: [
+    "{mix,.formatter}.exs",
+    "{config,lib,test}/**/*.{ex,exs}",
+    "assets/**/*.{js,jsx,ts,tsx,css}"
   ]
 ]
 ```

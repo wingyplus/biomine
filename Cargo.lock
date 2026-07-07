@@ -54,6 +54,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "biome_css_factory"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87f2746e735561c1cb84d74d5432c61aba63ea0738088cd1421d220210cc0d8f"
+dependencies = [
+ "biome_css_syntax",
+ "biome_rowan",
+]
+
+[[package]]
 name = "biome_css_formatter"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -64,6 +74,23 @@ dependencies = [
  "biome_formatter",
  "biome_rowan",
  "biome_suppression",
+]
+
+[[package]]
+name = "biome_css_parser"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6198a1b409476b23e21c6337b4f21bf5ac13f063b681f327ab2f09abcc332094"
+dependencies = [
+ "biome_console",
+ "biome_css_factory",
+ "biome_css_syntax",
+ "biome_diagnostics",
+ "biome_parser",
+ "biome_rowan",
+ "biome_unicode_table",
+ "tracing",
+ "unicode-bom",
 ]
 
 [[package]]
@@ -359,6 +386,7 @@ name = "biomine_native"
 version = "0.1.0"
 dependencies = [
  "biome_css_formatter",
+ "biome_css_parser",
  "biome_css_syntax",
  "biome_diagnostics",
  "biome_formatter",

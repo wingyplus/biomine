@@ -105,4 +105,31 @@ defmodule Biomine do
       {:error, %NimbleOptions.ValidationError{}} -> {:error, :invalid_option}
     end
   end
+
+  @doc """
+  Format CSS source.
+
+  Returns `{:ok, formatted_source}` when formatting succeeds.
+
+  Returns `{:error, {:parse_error, diagnostics}}` when the source cannot be
+  parsed.
+
+  ## Examples
+
+      iex> Biomine.format_css("a{color:red}")
+      {:ok, "a {\\n  color: red;\\n}\\n"}
+
+      iex> Biomine.format_css("a {")
+      {:error,
+       {:parse_error,
+        [
+          %{
+            message: "expected `}` but instead the file ends",
+            span: %{start: 3, end: 3}
+          }
+        ]}}
+  """
+  def format_css(source) do
+    Biomine.Native.format_css(source)
+  end
 end
