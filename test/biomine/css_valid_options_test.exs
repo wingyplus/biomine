@@ -48,6 +48,20 @@ defmodule Biomine.CSSValidOptionsTest do
           content: 'hi';
         }
         """
+      },
+      %{
+        option: "tailwind_directives",
+        source: """
+        a {
+          @apply    text-navy-100;
+        }
+        """,
+        opts: [tailwind_directives: true],
+        output: """
+        a {
+          @apply text-navy-100;
+        }
+        """
       }
     ]
 
