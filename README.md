@@ -49,8 +49,10 @@ Formatter options can be passed with the `:biomine` key:
 [
   plugins: [Biomine.Mix.JsFormatter],
   biomine: [
-    quote_style: :single,
-    semicolons: :as_needed
+    js: [
+      quote_style: :single,
+      semicolons: :as_needed
+    ]
   ],
   inputs: [
     "{mix,.formatter}.exs",
@@ -61,14 +63,20 @@ Formatter options can be passed with the `:biomine` key:
 ```
 
 Biomine can also format CSS files with `Biomine.Mix.CssFormatter`. It honors
-the same `:biomine` options key, with the CSS-specific options documented in
+the same `:biomine` options key, with CSS options nested under `:css` and
+documented in
 `Biomine.format_css/2`:
 
 ```elixir
 [
   plugins: [Biomine.Mix.JsFormatter, Biomine.Mix.CssFormatter],
   biomine: [
-    quote_style: :single
+    js: [
+      quote_style: :single
+    ],
+    css: [
+      quote_style: :single
+    ]
   ],
   inputs: [
     "{mix,.formatter}.exs",
@@ -99,7 +107,7 @@ when used as a `Phoenix.LiveView.HTMLFormatter.TagFormatter`. Add it to your
 This requires `:phoenix_live_view` (`~> 1.2`) in your own dependencies, since
 that's where `Phoenix.LiveView.HTMLFormatter` and the `TagFormatter` behaviour
 live. The same `:biomine` options key used by the Mix formatter plugin above
-is honored here too.
+is honored here too, using the nested `:js` options.
 
 ## Building from source
 

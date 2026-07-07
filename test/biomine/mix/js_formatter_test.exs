@@ -15,7 +15,14 @@ defmodule Biomine.Mix.JsFormatterTest do
   end
 
   test "format passes Biomine options from the formatter configuration" do
-    assert Biomine.Mix.JsFormatter.format("let x='hello'", biomine: [quote_style: :single]) ==
+    assert Biomine.Mix.JsFormatter.format("let x='hello'", biomine: [js: [quote_style: :single]]) ==
+             "let x = 'hello';\n"
+  end
+
+  test "format only uses the JavaScript Biomine options" do
+    assert Biomine.Mix.JsFormatter.format("let x='hello'",
+             biomine: [js: [quote_style: :single], css: [quote_style: :invalid]]
+           ) ==
              "let x = 'hello';\n"
   end
 
@@ -27,7 +34,7 @@ defmodule Biomine.Mix.JsFormatterTest do
 
   test "format raises on invalid Biomine options" do
     assert_raise Mix.Error, "invalid Biomine formatter option", fn ->
-      Biomine.Mix.JsFormatter.format("let x=1", biomine: [quote_style: :invalid])
+      Biomine.Mix.JsFormatter.format("let x=1", biomine: [js: [quote_style: :invalid]])
     end
   end
 end

@@ -6,9 +6,7 @@ use biome_formatter::{
     LineWidth, QuoteStyle,
 };
 use biome_js_formatter::context::JsFormatOptions;
-use biome_js_formatter::context::{
-    ArrowParentheses, QuoteProperties, Semicolons, TrailingCommas,
-};
+use biome_js_formatter::context::{ArrowParentheses, QuoteProperties, Semicolons, TrailingCommas};
 use biome_js_parser::JsParserOptions;
 use biome_languages::{CssFileSource, JsFileSource};
 use rustler::{Atom, Binary, Encoder, Env, OwnedBinary, Term};
@@ -141,7 +139,8 @@ fn override_js_options(
             }
             key if key == atoms::indent_width() => {
                 format_options.set_indent_width(
-                    IndentWidth::try_from(decode_u8(value)?).map_err(|_| atoms::invalid_option())?,
+                    IndentWidth::try_from(decode_u8(value)?)
+                        .map_err(|_| atoms::invalid_option())?,
                 );
             }
             key if key == atoms::line_ending() => {
@@ -316,7 +315,8 @@ fn override_css_options(
             }
             key if key == atoms::indent_width() => {
                 format_options.set_indent_width(
-                    IndentWidth::try_from(decode_u8(value)?).map_err(|_| atoms::invalid_option())?,
+                    IndentWidth::try_from(decode_u8(value)?)
+                        .map_err(|_| atoms::invalid_option())?,
                 );
             }
             key if key == atoms::line_ending() => {

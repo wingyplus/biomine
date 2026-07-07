@@ -24,14 +24,16 @@ if Code.ensure_loaded?(Phoenix.LiveView.HTMLFormatter.TagFormatter) do
     ]
     ```
 
-    Formatter options can be passed with the `:biomine` key, same as
+    Formatter options can be passed under `biomine: [js: ...]`, same as
     `Biomine.Mix.JsFormatter`:
 
     ```elixir
     [
       plugins: [Phoenix.LiveView.HTMLFormatter],
       tag_formatters: %{script: Biomine.LiveView.TagFormatter},
-      biomine: [quote_style: :single, semicolons: :as_needed],
+      biomine: [
+        js: [quote_style: :single, semicolons: :as_needed]
+      ],
       inputs: [
         "{mix,.formatter}.exs",
         "{config,lib,test}/**/*.{ex,exs,heex}"
@@ -46,7 +48,7 @@ if Code.ensure_loaded?(Phoenix.LiveView.HTMLFormatter.TagFormatter) do
 
     @impl true
     def render_tag({"script", _attrs, content}, opts) do
-      biomine_opts = Keyword.get(opts, :biomine, [])
+      biomine_opts = opts |> Keyword.get(:biomine, []) |> Keyword.get(:js, [])
 
       case Biomine.format_js(content, biomine_opts) do
         {:ok, formatted} ->

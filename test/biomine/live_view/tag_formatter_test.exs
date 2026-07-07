@@ -24,7 +24,7 @@ defmodule Biomine.LiveView.TagFormatterTest do
 
   test "passes Biomine options from the formatter configuration" do
     assert TagFormatter.render_tag({"script", %{}, "let x='hello'"},
-             biomine: [quote_style: :single]
+             biomine: [js: [quote_style: :single]]
            ) ==
              {:ok, "let x = 'hello';"}
   end
@@ -34,7 +34,9 @@ defmodule Biomine.LiveView.TagFormatterTest do
   end
 
   test "skips on invalid Biomine options" do
-    assert TagFormatter.render_tag({"script", %{}, "let x=1"}, biomine: [quote_style: :invalid]) ==
+    assert TagFormatter.render_tag({"script", %{}, "let x=1"},
+             biomine: [js: [quote_style: :invalid]]
+           ) ==
              :skip
   end
 

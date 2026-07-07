@@ -14,7 +14,7 @@ defmodule Biomine.Mix.JsFormatter do
 
   @impl Mix.Tasks.Format
   def format(contents, opts) do
-    biomine_opts = Keyword.get(opts, :biomine, [])
+    biomine_opts = opts |> Keyword.get(:biomine, []) |> Keyword.get(:js, [])
 
     case Biomine.format_js(contents, biomine_opts) do
       {:ok, formatted} -> formatted

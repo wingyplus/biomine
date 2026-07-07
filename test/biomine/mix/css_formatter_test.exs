@@ -12,7 +12,16 @@ defmodule Biomine.Mix.CssFormatterTest do
   end
 
   test "format passes Biomine options from the formatter configuration" do
-    assert Biomine.Mix.CssFormatter.format(~s(a{content:"hi"}), biomine: [quote_style: :single]) ==
+    assert Biomine.Mix.CssFormatter.format(~s(a{content:"hi"}),
+             biomine: [css: [quote_style: :single]]
+           ) ==
+             "a {\n  content: 'hi';\n}\n"
+  end
+
+  test "format only uses the CSS Biomine options" do
+    assert Biomine.Mix.CssFormatter.format(~s(a{content:"hi"}),
+             biomine: [js: [quote_style: :invalid], css: [quote_style: :single]]
+           ) ==
              "a {\n  content: 'hi';\n}\n"
   end
 
@@ -24,7 +33,7 @@ defmodule Biomine.Mix.CssFormatterTest do
 
   test "format raises on invalid Biomine options" do
     assert_raise Mix.Error, "invalid Biomine formatter option", fn ->
-      Biomine.Mix.CssFormatter.format("a{color:red}", biomine: [quote_style: :invalid])
+      Biomine.Mix.CssFormatter.format("a{color:red}", biomine: [css: [quote_style: :invalid]])
     end
   end
 end
