@@ -14,7 +14,8 @@ defmodule Biomine.MixProject do
       deps: deps(),
       package: package(),
       source_url: @source_url,
-      aliases: aliases()
+      aliases: aliases(),
+      docs: docs()
     ]
   end
 
@@ -42,6 +43,7 @@ defmodule Biomine.MixProject do
     [
       files: [
         "LICENSE",
+        "README.md",
         "lib",
         "native/biomine_native/src",
         "native/biomine_native/Cargo.toml",
@@ -61,6 +63,13 @@ defmodule Biomine.MixProject do
   defp aliases do
     [
       format: ["format", "cmd --cd native/biomine_native cargo fmt"]
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"]
     ]
   end
 end

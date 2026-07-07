@@ -1,6 +1,26 @@
 defmodule Biomine do
   @moduledoc """
-  Documentation for `Biomine`.
+  Elixir bindings for the [Biome](https://biomejs.dev/) formatter, exposed as a
+  Rust NIF. Format JavaScript/TypeScript and CSS source directly from Elixir
+  without shelling out to Node.
+
+      iex> Biomine.format_js("const  x=1")
+      {:ok, "const x = 1;\\n"}
+
+  The NIF ships as a precompiled binary via
+  [`rustler_precompiled`](https://hexdocs.pm/rustler_precompiled), so no Rust
+  toolchain is required to use this library — the matching artifact for your
+  OS, architecture, and NIF version is downloaded automatically at compile
+  time.
+
+  ## Mix formatter plugins
+
+  Biomine can be used as a `mix format` plugin for JavaScript/TypeScript and
+  CSS files via `Biomine.Mix.JsFormatter` and `Biomine.Mix.CssFormatter`, and
+  as a `Phoenix.LiveView.HTMLFormatter.TagFormatter` via
+  `Biomine.LiveView.TagFormatter` for formatting `<script>` tags (including
+  colocated hooks) in `.heex` templates. See those modules, or the
+  [README](https://github.com/wingyplus/biomine), for setup instructions.
   """
 
   @format_js_options NimbleOptions.new!(
