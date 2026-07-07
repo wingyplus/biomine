@@ -130,6 +130,12 @@ defmodule Biomine do
                         quote_style: [
                           type: {:in, [:double, :single]},
                           doc: "CSS quote style, either `:double` or `:single`."
+                        ],
+                        tailwind_directives: [
+                          type: :boolean,
+                          default: false,
+                          doc:
+                            "Enables parsing of Tailwind CSS 4.0 directives and functions, like `@theme`, `@utility`, and `@apply`."
                         ]
                       )
 

@@ -2,15 +2,15 @@ use biome_css_formatter::context::CssFormatOptions;
 use biome_css_parser::CssParserOptions;
 use biome_diagnostics::{Diagnostic, PrintDescription};
 use biome_formatter::{
-    AttributePosition, IndentStyle, IndentWidth, LineEnding, LineWidth, QuoteStyle,
+    AttributePosition, BracketSameLine, BracketSpacing, IndentStyle, IndentWidth, LineEnding,
+    LineWidth, QuoteStyle,
 };
-use biome_js_formatter::context::trailing_comma::TrailingComma;
 use biome_js_formatter::context::JsFormatOptions;
 use biome_js_formatter::context::{
-    ArrowParentheses, BracketSameLine, BracketSpacing, QuoteProperties, Semicolons,
+    ArrowParentheses, QuoteProperties, Semicolons, TrailingCommas,
 };
 use biome_js_parser::JsParserOptions;
-use biome_js_syntax::JsFileSource;
+use biome_languages::{CssFileSource, JsFileSource};
 use rustler::{Atom, Binary, Encoder, Env, OwnedBinary, Term};
 
 mod atoms {
@@ -50,7 +50,8 @@ mod atoms {
         none,
         always,
         auto,
-        multiline
+        multiline,
+        tailwind_directives
     }
 }
 
@@ -79,7 +80,7 @@ fn format_js<'a>(
         Err(reason) => return error(reason.to_term(env)),
     };
 
-    let formatted = biome_js_formatter::format_node(js_options, &parsed.syntax())
+    let formatted = biome_js_formatter::format_node(js_options, &parsed.syntax(), Vec::new())
         .unwrap()
         .print()
         .unwrap();
@@ -139,7 +140,9 @@ fn override_js_options(
                 format_options.set_indent_style(decode_indent_style(value)?);
             }
             key if key == atoms::indent_width() => {
-                format_options.set_indent_width(IndentWidth::from(decode_u8(value)?));
+                format_options.set_indent_width(
+                    IndentWidth::try_from(decode_u8(value)?).map_err(|_| atoms::invalid_option())?,
+                );
             }
             key if key == atoms::line_ending() => {
                 format_options.set_line_ending(decode_line_ending(value)?);
@@ -159,7 +162,7 @@ fn override_js_options(
                 format_options.set_quote_properties(decode_quote_properties(value)?);
             }
             key if key == atoms::trailing_comma() => {
-                format_options.set_trailing_comma(decode_trailing_comma(value)?);
+                format_options.set_trailing_commas(decode_trailing_comma(value)?);
             }
             key if key == atoms::semicolons() => {
                 format_options.set_semicolons(decode_semicolons(value)?);
@@ -232,11 +235,11 @@ fn decode_quote_properties(term: Term) -> Result<QuoteProperties, Atom> {
     }
 }
 
-fn decode_trailing_comma(term: Term) -> Result<TrailingComma, Atom> {
+fn decode_trailing_comma(term: Term) -> Result<TrailingCommas, Atom> {
     match decode_atom(term)? {
-        atom if atom == atoms::all() => Ok(TrailingComma::All),
-        atom if atom == atoms::es5() => Ok(TrailingComma::Es5),
-        atom if atom == atoms::none() => Ok(TrailingComma::None),
+        atom if atom == atoms::all() => Ok(TrailingCommas::All),
+        atom if atom == atoms::es5() => Ok(TrailingCommas::Es5),
+        atom if atom == atoms::none() => Ok(TrailingCommas::None),
         _ => Err(atoms::invalid_option()),
     }
 }
@@ -272,12 +275,19 @@ fn format_css<'a>(
     options: Vec<(Atom, Term<'a>)>,
 ) -> (Atom, Term<'a>) {
     let input = std::str::from_utf8(source.as_slice()).unwrap();
-    let parsed = biome_css_parser::parse_css(input, CssParserOptions::default());
+
+    let parser_options = match override_css_parser_options(CssParserOptions::default(), &options) {
+        Ok(options) => options,
+        Err(reason) => return error(reason.to_term(env)),
+    };
+
+    let file_source = CssFileSource::css();
+    let parsed = biome_css_parser::parse_css(input, file_source, parser_options);
     if parsed.has_errors() {
         return error(parse_error(env, parsed.diagnostics()));
     }
 
-    let css_options = match override_css_options(CssFormatOptions::default(), options) {
+    let css_options = match override_css_options(CssFormatOptions::new(file_source), options) {
         Ok(options) => options,
         Err(reason) => return error(reason.to_term(env)),
     };
@@ -305,7 +315,9 @@ fn override_css_options(
                 format_options.set_indent_style(decode_indent_style(value)?);
             }
             key if key == atoms::indent_width() => {
-                format_options.set_indent_width(IndentWidth::from(decode_u8(value)?));
+                format_options.set_indent_width(
+                    IndentWidth::try_from(decode_u8(value)?).map_err(|_| atoms::invalid_option())?,
+                );
             }
             key if key == atoms::line_ending() => {
                 format_options.set_line_ending(decode_line_ending(value)?);
@@ -318,11 +330,25 @@ fn override_css_options(
             key if key == atoms::quote_style() => {
                 format_options.set_quote_style(decode_quote_style(value)?);
             }
+            key if key == atoms::tailwind_directives() => {}
             _ => return Err(atoms::invalid_option()),
         }
     }
 
     Ok(format_options)
+}
+
+fn override_css_parser_options(
+    mut parser_options: CssParserOptions,
+    options: &[(Atom, Term)],
+) -> Result<CssParserOptions, Atom> {
+    for (key, value) in options {
+        if *key == atoms::tailwind_directives() && decode_bool(*value)? {
+            parser_options = parser_options.allow_tailwind_directives();
+        }
+    }
+
+    Ok(parser_options)
 }
 
 rustler::init!("Elixir.Biomine.Native");

@@ -8,16 +8,20 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-biome_css_formatter = "=0.5.7"
-biome_css_parser = "=0.5.7"
-biome_css_syntax = "=0.5.7"
-biome_formatter = "=0.5.7"
-biome_js_formatter = "=0.5.7"
-biome_js_parser = "=0.5.7"
-biome_js_syntax = "=0.5.7"
-biome_diagnostics = "=0.5.7"
-biome_rowan = "=0.5.7"
-biome_parser = "=0.5.7"
-biome_unicode_table = "=0.5.7"
+biome_css_formatter = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_css_parser = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_css_syntax = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_formatter = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_js_formatter = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_js_parser = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_js_syntax = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_languages = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27", features = [
+  "lang_css",
+  "lang_js",
+] }
+biome_diagnostics = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_rowan = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_parser = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
+biome_unicode_table = { git = "https://github.com/biomejs/biome", rev = "467b496f518d8b1f35aea77007b886ba98038a27" }
 
 rustler = "0.38.0"
