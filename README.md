@@ -60,11 +60,16 @@ Formatter options can be passed with the `:biomine` key:
 ]
 ```
 
-Biomine can also format CSS files with `Biomine.Mix.CssFormatter`:
+Biomine can also format CSS files with `Biomine.Mix.CssFormatter`. It honors
+the same `:biomine` options key, with the CSS-specific options documented in
+`Biomine.format_css/2`:
 
 ```elixir
 [
   plugins: [Biomine.Mix.JsFormatter, Biomine.Mix.CssFormatter],
+  biomine: [
+    quote_style: :single
+  ],
   inputs: [
     "{mix,.formatter}.exs",
     "{config,lib,test}/**/*.{ex,exs}",

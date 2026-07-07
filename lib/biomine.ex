@@ -106,18 +106,53 @@ defmodule Biomine do
     end
   end
 
+  @format_css_options NimbleOptions.new!(
+                        indent_style: [
+                          type: {:in, [:tab, :space]},
+                          default: :space,
+                          doc: "Indentation style, either `:tab` or `:space`."
+                        ],
+                        indent_width: [
+                          type: :non_neg_integer,
+                          default: 2,
+                          doc: "Indentation width as an integer."
+                        ],
+                        line_ending: [
+                          type: {:in, [:lf, :crlf, :cr]},
+                          default: :lf,
+                          doc: "Line ending style, one of `:lf`, `:crlf`, or `:cr`."
+                        ],
+                        line_width: [
+                          type: {:in, 1..320},
+                          default: 120,
+                          doc: "Maximum line width as an integer from 1 to 320."
+                        ],
+                        quote_style: [
+                          type: {:in, [:double, :single]},
+                          doc: "CSS quote style, either `:double` or `:single`."
+                        ]
+                      )
+
   @doc """
   Format CSS source.
 
   Returns `{:ok, formatted_source}` when formatting succeeds.
 
   Returns `{:error, {:parse_error, diagnostics}}` when the source cannot be
-  parsed.
+  parsed and `{:error, :invalid_option}` when an unsupported option or option
+  value is provided.
+
+  ## Options
+
+  #{NimbleOptions.docs(@format_css_options)}
 
   ## Examples
 
       iex> Biomine.format_css("a{color:red}")
       {:ok, "a {\\n  color: red;\\n}\\n"}
+
+      iex> Biomine.format_css(~s(a{content:"hi"}), quote_style: :single)
+      {:ok, "a {\\n  content: 'hi';\\n}\\n"}
 
       iex> Biomine.format_css("a {")
       {:error,
@@ -129,7 +164,10 @@ defmodule Biomine do
           }
         ]}}
   """
-  def format_css(source) do
-    Biomine.Native.format_css(source)
+  def format_css(source, opts \\ []) do
+    case NimbleOptions.validate(opts, @format_css_options) do
+      {:ok, validated_opts} -> Biomine.Native.format_css(source, validated_opts)
+      {:error, %NimbleOptions.ValidationError{}} -> {:error, :invalid_option}
+    end
   end
 end

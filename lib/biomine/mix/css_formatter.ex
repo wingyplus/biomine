@@ -13,9 +13,12 @@ defmodule Biomine.Mix.CssFormatter do
   end
 
   @impl Mix.Tasks.Format
-  def format(contents, _opts) do
-    case Biomine.format_css(contents) do
+  def format(contents, opts) do
+    biomine_opts = Keyword.get(opts, :biomine, [])
+
+    case Biomine.format_css(contents, biomine_opts) do
       {:ok, formatted} -> formatted
+      {:error, :invalid_option} -> Mix.raise("invalid Biomine formatter option")
       {:error, {:parse_error, diagnostics}} -> Mix.raise(parse_error_message(diagnostics))
     end
   end

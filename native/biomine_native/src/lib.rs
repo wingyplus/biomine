@@ -266,16 +266,22 @@ fn decode_attribute_position(term: Term) -> Result<AttributePosition, Atom> {
 }
 
 #[rustler::nif]
-fn format_css<'a>(env: Env<'a>, source: Binary<'a>) -> (Atom, Term<'a>) {
+fn format_css<'a>(
+    env: Env<'a>,
+    source: Binary<'a>,
+    options: Vec<(Atom, Term<'a>)>,
+) -> (Atom, Term<'a>) {
     let input = std::str::from_utf8(source.as_slice()).unwrap();
     let parsed = biome_css_parser::parse_css(input, CssParserOptions::default());
     if parsed.has_errors() {
         return error(parse_error(env, parsed.diagnostics()));
     }
 
-    let css_options = CssFormatOptions::default()
-        .with_indent_style(IndentStyle::Space)
-        .with_indent_width(IndentWidth::from(2));
+    let css_options = match override_css_options(CssFormatOptions::default(), options) {
+        Ok(options) => options,
+        Err(reason) => return error(reason.to_term(env)),
+    };
+
     let formatted = biome_css_formatter::format_node(css_options, &parsed.syntax())
         .unwrap()
         .print()
@@ -287,6 +293,36 @@ fn format_css<'a>(env: Env<'a>, source: Binary<'a>) -> (Atom, Term<'a>) {
     binary.as_mut_slice().copy_from_slice(output);
 
     ok(binary.release(env).to_term(env))
+}
+
+fn override_css_options(
+    mut format_options: CssFormatOptions,
+    options: Vec<(Atom, Term)>,
+) -> Result<CssFormatOptions, Atom> {
+    for (key, value) in options {
+        match key {
+            key if key == atoms::indent_style() => {
+                format_options.set_indent_style(decode_indent_style(value)?);
+            }
+            key if key == atoms::indent_width() => {
+                format_options.set_indent_width(IndentWidth::from(decode_u8(value)?));
+            }
+            key if key == atoms::line_ending() => {
+                format_options.set_line_ending(decode_line_ending(value)?);
+            }
+            key if key == atoms::line_width() => {
+                let line_width =
+                    LineWidth::try_from(decode_u16(value)?).map_err(|_| atoms::invalid_option())?;
+                format_options.set_line_width(line_width);
+            }
+            key if key == atoms::quote_style() => {
+                format_options.set_quote_style(decode_quote_style(value)?);
+            }
+            _ => return Err(atoms::invalid_option()),
+        }
+    }
+
+    Ok(format_options)
 }
 
 rustler::init!("Elixir.Biomine.Native");

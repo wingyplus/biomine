@@ -22,5 +22,5 @@ defmodule Biomine.Native do
     )
 
   def format_js(_source, _opts), do: :erlang.nif_error(:nif_not_loaded)
-  def format_css(_source), do: :erlang.nif_error(:nif_not_loaded)
+  def format_css(_source, _opts), do: :erlang.nif_error(:nif_not_loaded)
 end

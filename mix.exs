@@ -13,7 +13,8 @@ defmodule Biomine.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      source_url: @source_url
+      source_url: @source_url,
+      aliases: aliases()
     ]
   end
 
@@ -54,6 +55,12 @@ defmodule Biomine.MixProject do
       ],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
+    ]
+  end
+
+  defp aliases do
+    [
+      format: ["format", "cmd --cd native/biomine_native cargo fmt"]
     ]
   end
 end
