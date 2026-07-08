@@ -18,9 +18,10 @@ defmodule Biomine do
   Biomine can be used as a `mix format` plugin for JavaScript/TypeScript and
   CSS files via `Biomine.Mix.JsFormatter` and `Biomine.Mix.CssFormatter`, and
   as a `Phoenix.LiveView.HTMLFormatter.TagFormatter` via
-  `Biomine.LiveView.TagFormatter` for formatting `<script>` tags (including
-  colocated hooks) in `.heex` templates. See those modules, or the
-  [README](https://github.com/wingyplus/biomine), for setup instructions.
+  `Biomine.LiveView.TagFormatter` for formatting `<script>` and `<style>` tags
+  (including colocated hooks and colocated CSS) in `.heex` templates. See
+  those modules, or the [README](https://github.com/wingyplus/biomine), for
+  setup instructions.
   """
 
   @format_js_options NimbleOptions.new!(

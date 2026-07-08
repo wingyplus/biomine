@@ -88,15 +88,21 @@ documented in
 
 ## Phoenix.LiveView.HTMLFormatter tag formatter
 
-Biomine can also format `<script>` tags inside `.heex` templates — including
-[colocated hooks](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.ColocatedHook.html) —
+Biomine can also format `<script>` and `<style>` tags inside `.heex`
+templates — including
+[colocated Hook](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.ColocatedHook.html)
+and
+[colocated CSS](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.ColocatedCSS.html) —
 when used as a `Phoenix.LiveView.HTMLFormatter.TagFormatter`. Add it to your
 `.formatter.exs` alongside `Phoenix.LiveView.HTMLFormatter`:
 
 ```elixir
 [
   plugins: [Phoenix.LiveView.HTMLFormatter],
-  tag_formatters: %{script: Biomine.LiveView.TagFormatter},
+  tag_formatters: %{
+    script: Biomine.LiveView.TagFormatter,
+    style: Biomine.LiveView.TagFormatter
+  },
   inputs: [
     "{mix,.formatter}.exs",
     "{config,lib,test}/**/*.{ex,exs,heex}"
@@ -107,7 +113,8 @@ when used as a `Phoenix.LiveView.HTMLFormatter.TagFormatter`. Add it to your
 This requires `:phoenix_live_view` (`~> 1.2`) in your own dependencies, since
 that's where `Phoenix.LiveView.HTMLFormatter` and the `TagFormatter` behaviour
 live. The same `:biomine` options key used by the Mix formatter plugin above
-is honored here too, using the nested `:js` options.
+is honored here too, using the nested `:js` and `:css` options, applied to
+`<script>` and `<style>` tags respectively.
 
 ## Building from source
 
