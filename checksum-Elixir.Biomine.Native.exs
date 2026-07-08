@@ -1,10 +1,10 @@
 %{
-  "biomine_native-v0.2.1-nif-2.15-x86_64-pc-windows-gnu.dll.tar.gz" => "sha256:2409f028b694f8f190d8d3860641430566be13fd13f10196c23ef410cb5e1d7e",
-  "biomine_native-v0.2.1-nif-2.15-x86_64-pc-windows-msvc.dll.tar.gz" => "sha256:53b47f756c03d0c8ac1db9b4e12d6df68439f1fef5e012a4c6c892923d925a5d",
-  "libbiomine_native-v0.2.1-nif-2.15-aarch64-apple-darwin.so.tar.gz" => "sha256:5f6b20f0e2cb996ad857c6400f82e8687a48ea67be2200e40503dfbf87a53150",
-  "libbiomine_native-v0.2.1-nif-2.15-aarch64-unknown-linux-gnu.so.tar.gz" => "sha256:52b38803bb9113e5abaf1db6c4cd47018f2625bae8b7790df1b8870a61ba7709",
-  "libbiomine_native-v0.2.1-nif-2.15-aarch64-unknown-linux-musl.so.tar.gz" => "sha256:a024505c08d81ad5b5d8ca3271fc0fc6458a8b951269bc4b9818a9ac9c0cb8bd",
-  "libbiomine_native-v0.2.1-nif-2.15-x86_64-apple-darwin.so.tar.gz" => "sha256:8eb8a588baab3aad10920acd18dbf7d9a66e0f9dd89f8262996f16cb67c54ca0",
-  "libbiomine_native-v0.2.1-nif-2.15-x86_64-unknown-linux-gnu.so.tar.gz" => "sha256:070ed20995168583b02506d12d7eee47ba6543f0fd2d027f62ad8ee92ceffb1e",
-  "libbiomine_native-v0.2.1-nif-2.15-x86_64-unknown-linux-musl.so.tar.gz" => "sha256:028b5a1e0f55090ca081af3966fd4b60049f5349380b2a6dec3e3b46cb71e333",
+  "biomine_native-v0.2.2-nif-2.15-x86_64-pc-windows-gnu.dll.tar.gz" => "sha256:a92029dff80c8c06d6f1755cbf24cd2b1349dbb3f8418e4edb07017f92438a3d",
+  "biomine_native-v0.2.2-nif-2.15-x86_64-pc-windows-msvc.dll.tar.gz" => "sha256:ab7ca0cb4fbc5c5e7791fa963cee4031e6f89607c2b35773eb8300f3cfce0547",
+  "libbiomine_native-v0.2.2-nif-2.15-aarch64-apple-darwin.so.tar.gz" => "sha256:c78dd6f4c866ca0691647559e8a312c5e90f98b3d2b98864b7d077aa4489ef8e",
+  "libbiomine_native-v0.2.2-nif-2.15-aarch64-unknown-linux-gnu.so.tar.gz" => "sha256:109add87674ff691637902af83daeda804518aebe3bc5a746daa25550f4a446b",
+  "libbiomine_native-v0.2.2-nif-2.15-aarch64-unknown-linux-musl.so.tar.gz" => "sha256:58b1a065ea1d930d3da3da00748f2ac8dd3cb0d9c9cf088ebd23ce8714cf6b24",
+  "libbiomine_native-v0.2.2-nif-2.15-x86_64-apple-darwin.so.tar.gz" => "sha256:087620b3672adc5d962158c78d1c8a771b884a46d1c9fd9604da68f607149442",
+  "libbiomine_native-v0.2.2-nif-2.15-x86_64-unknown-linux-gnu.so.tar.gz" => "sha256:1a87433bc86bd946a680d1b5b65f40818f8e2e9666e3ac06663f904518586343",
+  "libbiomine_native-v0.2.2-nif-2.15-x86_64-unknown-linux-musl.so.tar.gz" => "sha256:5cb6e1c9de9283d55386896650a86a4842859e6aed9f18f65348d12283f5b9fc",
 }
