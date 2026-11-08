@@ -71,6 +71,24 @@ defmodule Biomine.LiveView.TagFormatterTest do
     assert TagFormatter.render_tag({"style", %{}, "a{"}, []) == :skip
   end
 
+  # Phoenix.LiveView.HTMLFormatter passes the raw tag body, which is already
+  # indented from the previous format run. Biome dedents code but keeps block
+  # comment continuation lines verbatim, so the comment drifts right on every
+  # `mix format`.
+  test "does not keep template indentation inside multiline script comments" do
+    content = "    /*\n      multiline\n      comment\n    */\n    let x = 1;\n"
+
+    assert TagFormatter.render_tag({"script", %{}, content}, []) ==
+             {:ok, "/*\n  multiline\n  comment\n*/\nlet x = 1;"}
+  end
+
+  test "does not keep template indentation inside multiline style comments" do
+    content = "    /*\n      multiline\n      comment\n    */\n    a { color: red; }\n"
+
+    assert TagFormatter.render_tag({"style", %{}, content}, []) ==
+             {:ok, "/*\n  multiline\n  comment\n*/\na {\n  color: red;\n}"}
+  end
+
   test "skips style tag on invalid Biomine options" do
     assert TagFormatter.render_tag({"style", %{}, "a{color:red}"},
              biomine: [css: [quote_style: :invalid]]
